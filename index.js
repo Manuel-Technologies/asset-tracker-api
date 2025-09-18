@@ -34,9 +34,9 @@ async function fetchStockPrice(symbol, period = '1d') {
     else if (period === '1d') { interval = '1h'; range = '5d'; }
     else { interval = '1h'; range = '1mo'; } // 1w
 
-    const query = `${symbol}.NS`; // Adjust for your region (e.g., .NS for India, remove for US)
-    const result = await yahooFinance.chart(query, { interval, range });
-    if (!result || !result.quotes) throw new Error('No data');
+    // Fixed: Pass options as { period: range, interval } to avoid validation error
+    const result = await yahooFinance.chart(symbol, { period: range, interval });
+    if (!result || !result.quotes || result.quotes.length === 0) throw new Error('No data');
 
     const currentPrice = result.quotes[result.quotes.length - 1].close;
     const candles = result.quotes.map(q => ({
